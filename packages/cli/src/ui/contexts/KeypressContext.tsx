@@ -19,7 +19,6 @@ import { ESC } from '../utils/input.js';
 import { parseMouseEvent } from '../utils/mouse.js';
 import { FOCUS_IN, FOCUS_OUT } from '../hooks/useFocus.js';
 import { appEvents, AppEvent } from '../../utils/events.js';
-import { terminalCapabilityManager } from '../utils/terminalCapabilityManager.js';
 
 export const BACKSLASH_ENTER_TIMEOUT = 5;
 export const ESC_TIMEOUT = 50;
@@ -661,9 +660,7 @@ export function KeypressProvider({
     process.stdin.setEncoding('utf8'); // Make data events emit strings
 
     let processor = nonKeyboardEventFilter(broadcast);
-    if (!terminalCapabilityManager.isBracketedPasteEnabled()) {
-      processor = bufferFastReturn(processor);
-    }
+    processor = bufferFastReturn(processor);
     processor = bufferBackslashEnter(processor);
     processor = bufferPaste(processor);
     let dataListener = createDataListener(processor);
