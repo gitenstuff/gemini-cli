@@ -201,6 +201,7 @@ export const AppContainer = (props: AppContainerProps) => {
   const [queueErrorMessage, setQueueErrorMessage] = useState<string | null>(
     null,
   );
+  const [isContextViewOpen, setIsContextViewOpen] = useState<boolean>(false);
 
   const [defaultBannerText, setDefaultBannerText] = useState('');
   const [warningBannerText, setWarningBannerText] = useState('');
@@ -803,6 +804,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
     loopDetectionConfirmationRequest,
     lastOutputTime,
     retryStatus,
+    fullContextForView,
   } = useGeminiStream(
     config.getGeminiClient(),
     historyManager.history,
@@ -1272,6 +1274,8 @@ Logging in with Google... Restarting Gemini CLI to continue.
         setShowErrorDetails((prev) => !prev);
       } else if (keyMatchers[Command.SHOW_FULL_TODOS](key)) {
         setShowFullTodos((prev) => !prev);
+      } else if (keyMatchers[Command.SHOW_CONTEXT](key)) {
+        setIsContextViewOpen((prev) => !prev);
       } else if (keyMatchers[Command.TOGGLE_MARKDOWN](key)) {
         setRenderMarkdown((prev) => {
           const newValue = !prev;
@@ -1450,6 +1454,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
   const nightly = props.version.includes('nightly');
 
   const dialogsVisible =
+    isContextViewOpen ||
     shouldShowIdePrompt ||
     isFolderTrustDialogOpen ||
     !!shellConfirmationRequest ||
@@ -1582,6 +1587,8 @@ Logging in with Google... Restarting Gemini CLI to continue.
       messageQueue,
       queueErrorMessage,
       showAutoAcceptIndicator,
+      isContextViewOpen,
+      fullContextForView,
       currentModel,
       userTier,
       proQuotaRequest,
@@ -1708,6 +1715,8 @@ Logging in with Google... Restarting Gemini CLI to continue.
       warningMessage,
       bannerData,
       bannerVisible,
+      isContextViewOpen,
+      fullContextForView,
       config,
       settingsNonce,
     ],
@@ -1731,6 +1740,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
       exitPrivacyNotice,
       closeSettingsDialog,
       closeModelDialog,
+      closeContextView: () => setIsContextViewOpen(false),
       openPermissionsDialog,
       closePermissionsDialog,
       setShellModeActive,
@@ -1774,6 +1784,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
       handleIdePromptComplete,
       handleFolderTrustSelect,
       setConstrainHeight,
+      setIsContextViewOpen,
       handleEscapePromptChange,
       refreshStatic,
       handleFinalSubmit,

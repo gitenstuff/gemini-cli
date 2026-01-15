@@ -272,6 +272,18 @@ export class GeminiClient {
     return this.currentSequenceModel;
   }
 
+  getFullContext(): {
+    systemInstruction: string;
+    history: Content[];
+  } {
+    const systemMemory = this.config.isJitContextEnabled()
+      ? this.config.getGlobalMemory()
+      : this.config.getUserMemory();
+    const systemInstruction = getCoreSystemPrompt(this.config, systemMemory);
+    const history = this.getHistory();
+    return { systemInstruction, history };
+  }
+
   async addDirectoryContext(): Promise<void> {
     if (!this.chat) {
       return;

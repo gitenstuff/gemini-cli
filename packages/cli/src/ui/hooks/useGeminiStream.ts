@@ -125,6 +125,9 @@ export const useGeminiStream = (
   const activeQueryIdRef = useRef<string | null>(null);
   const [isResponding, setIsResponding] = useState<boolean>(false);
   const [thought, setThought] = useState<ThoughtSummary | null>(null);
+  const [fullContextForView, setFullContextForView] = useState<object | null>(
+    null,
+  );
   const [pendingHistoryItem, pendingHistoryItemRef, setPendingHistoryItem] =
     useStateAndRef<HistoryItemWithoutId | null>(null);
   const [lastGeminiActivityTime, setLastGeminiActivityTime] =
@@ -924,6 +927,7 @@ export const useGeminiStream = (
       if (toolCallRequests.length > 0) {
         scheduleToolCalls(toolCallRequests, signal);
       }
+      setFullContextForView(geminiClient.getFullContext());
       return StreamProcessingStatus.Completed;
     },
     [
@@ -939,6 +943,7 @@ export const useGeminiStream = (
       handleChatModelEvent,
       handleAgentExecutionStoppedEvent,
       handleAgentExecutionBlockedEvent,
+      geminiClient,
     ],
   );
   const submitQuery = useCallback(
@@ -986,6 +991,8 @@ export const useGeminiStream = (
             if (!shouldProceed || queryToSend === null) {
               return;
             }
+
+            setFullContextForView(geminiClient.getFullContext());
 
             if (!options?.isContinuation) {
               if (typeof queryToSend === 'string') {
@@ -1389,5 +1396,6 @@ export const useGeminiStream = (
     loopDetectionConfirmationRequest,
     lastOutputTime,
     retryStatus,
+    fullContextForView,
   };
 };
